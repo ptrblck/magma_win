@@ -400,13 +400,22 @@ magma_print_environment()
         cudaDeviceProp prop;
         err = cudaGetDeviceProperties( &prop, dev );
         check_error( err );
-        printf( "%% device %d: %s, %.1f MHz clock, %.1f MiB memory, capability %d.%d\n",
-                dev,
-                prop.name,
-                prop.clockRate / 1000.,
-                prop.totalGlobalMem / (1024.*1024.),
-                prop.major,
-                prop.minor );
+        #if CUDA_VERSION < 13000
+            printf( "%% device %d: %s, %.1f MHz clock, %.1f MiB memory, capability %d.%d\n",
+                    dev,
+                    prop.name,
+                    prop.clockRate / 1000.,
+                    prop.totalGlobalMem / (1024.*1024.),
+                    prop.major,
+                    prop.minor );
+        #else
+            printf( "%% device %d: %s, ??? MHz clock, %.1f MiB memory, capability %d.%d\n",
+                    dev,
+                    prop.name,
+                    prop.totalGlobalMem / (1024.*1024.),
+                    prop.major,
+                    prop.minor );
+        #endif
 
         int arch = prop.major*100 + prop.minor*10;
         if ( arch < MIN_CUDA_ARCH ) {
